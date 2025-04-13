@@ -1,0 +1,42 @@
+<body>
+  
+
+<div class="calendar">
+    <div class="calendar-header">
+      <button (click)="prevMonth()" class="nav-button">←</button>
+      <h2>{{ currentYear }}. {{ currentMonth | monthName }}</h2>
+      <button (click)="nextMonth()" class="nav-button">→</button>
+    </div>
+    
+    <table id="calendar-table">
+      <thead>
+        <tr>
+          <th *ngFor="let day of weekDays">{{ day }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let week of [0,1,2,3,4,5]">
+          <td *ngFor="let day of [0,1,2,3,4,5,6]"
+            (click)="openDayModal(week * 7 + day - firstDayIndex + 1)"
+            [ngClass]="{
+              'green-day': isWorkoutDay(week * 7 + day - firstDayIndex + 1),
+              'yellow-day': isRestDayColor(week * 7 + day - firstDayIndex + 1),
+            }">
+            <span *ngIf="week * 7 + day - firstDayIndex + 1 > 0 && week * 7 + day - firstDayIndex + 1 <= daysInMonth.length">
+              {{ week * 7 + day - firstDayIndex + 1 }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <!--Felugró ablak-->
+    <div *ngIf="selectedDay !== null" class="modal">
+    <div class="modal-content">
+      <span class="close" (click)="closeModal()">&times;</span>
+      <h2>{{ currentYear }}.{{ (currentMonth + 1).toString().padStart(2, '0') }}.{{ selectedDay }}</h2>
+      <h1>TODO</h1>
+</div>
+</div>
+  </div>
+</body>
+  

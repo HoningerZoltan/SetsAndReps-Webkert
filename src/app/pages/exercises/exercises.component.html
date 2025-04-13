@@ -1,0 +1,57 @@
+<body>
+
+  <div class="container">
+      <h2>Új gyakorlat hozzáadása</h2>
+      <form [formGroup]="exerciseForm" (ngSubmit)="onSubmit()" class="exercise-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Exercise Name</mat-label>
+            <input matInput type="text" formControlName="name" required>
+            <mat-icon matSuffix>fitness_center</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+              <mat-label>Muscle group</mat-label>
+              <mat-select formControlName="muscleGroups" multiple>
+                <mat-option value="chest">Chest</mat-option>
+                <mat-option value="back">Back</mat-option>
+                <mat-option value="legs">Legs</mat-option>
+                <mat-option value="arms">Arms</mat-option>
+                <mat-option value="shoulders">Shoulders</mat-option>
+                <mat-option value="abs">Abs</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>accessibility</mat-icon>
+            </mat-form-field>
+        
+          <mat-form-field appearance="outline">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" required></textarea>
+          </mat-form-field>
+        
+          <mat-form-field appearance="outline">
+            <mat-label>Calories Burned / Repetitions</mat-label>
+            <input matInput type="number" formControlName="calories" required>
+            <mat-icon matSuffix>local_fire_department</mat-icon>
+          </mat-form-field>
+        
+          <mat-form-field appearance="outline">
+            <mat-label>Repetitions</mat-label>
+            <input matInput type="number" formControlName="repetitions" required>
+            <mat-icon matSuffix>loop</mat-icon>
+          </mat-form-field>
+          
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit" [disabled]="exerciseForm.invalid">Submit</button>
+          </div>
+        </form>
+  
+      <h2>Gyakorlatok listája</h2>
+      <div class="exercise-list">
+        <app-exercise-card
+        *ngFor="let ex of exercises; let i = index"
+        [exercise]="ex"
+        (delete)="deleteExercise(i)">
+      </app-exercise-card>
+      </div>
+  </div>
+    
+  </body>
+  

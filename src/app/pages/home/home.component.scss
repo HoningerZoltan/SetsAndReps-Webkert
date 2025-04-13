@@ -1,0 +1,75 @@
+.homepage {
+  padding: 20px;
+  background-color: #f4f4f4;
+  font-family: Arial, sans-serif;
+  margin-left: 16.5625rem; ;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: #333;
+  }
+
+  .streak, .latest-workout, .monthly-progress {
+    background-color: white;
+    width: 70%;
+    margin: auto;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .streak-details, .workout-details, .progress-details {
+    font-size: 1.1rem;
+    color: #555;
+    text-align: center;
+
+    p {
+      margin: 10px 0;
+    }
+  }
+
+  .streak-details strong, .workout-details strong, .progress-details strong {
+    color: #28a745; 
+  }
+
+  .progress-bar {
+    background-color: #ddd;
+    border-radius: 5px;
+    height: 15px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .progress {
+    background-color: #007bff;
+    height: 100%;
+    border-radius: 5px;
+  }
+
+  .streak{
+      text-align: left;
+
+    
+  }
+  img{
+    width: 150px;
+    float: left;
+  }
+  
+}
+
+
+
+@media screen and (max-width: 768px) {
+  .homepage{
+    margin-left: 0;
+  }
+  .homepage img{
+    width: 60px;
+    display: block;
+    margin: auto;
+  }
+}

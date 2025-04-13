@@ -1,0 +1,58 @@
+/* Vízszintes menü stílusai - alulra helyezve */
+.horizontal-menu {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    background-color: #012a5b;
+    padding: 10px 0;
+    border-top: 2px solid #000;
+  }
+  
+  /* Menü lista elrendezése */
+  .horizontal-menu-nav {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Menüelemek */
+  .horizontal-menu-item {
+    margin: 0 20px;
+  }
+  
+
+  .horizontal-menu-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .horizontal-link-icon {
+    font-size: 24px;
+    color: #fff;
+    transition: color 0.3s ease;
+  }
+
+  .horizontal-menu-link:hover .horizontal-link-icon {
+    color: #6ac3de;
+  }
+  
+  .horizontal-menu-item:last-child {
+    margin-right: 0;
+  }
+  
+  .active .horizontal-link-icon {
+    color: #6ac3de;
+  }
+
+  @media (min-width: 768px) {
+    .horizontal-menu {
+      display: none;
+    }
+  }
+  

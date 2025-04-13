@@ -1,0 +1,92 @@
+.water-tracker {
+    margin-left: 16.5625rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+    padding: 10px;
+}
+
+mat-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+mat-raised-button {
+    padding: 12px 20px; 
+    font-size: 16px;
+    width: 150px; 
+    border-radius: 8px; 
+    transition: all 0.3s ease; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
+mat-raised-button:hover {
+    background-color: #1976d2; 
+    color: white; 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+mat-raised-button:active {
+    background-color: #1565c0; 
+    box-shadow: none;
+}
+
+.status {
+    font-size: 18px;
+    margin-bottom: 20px;
+    width: 80%;
+}
+
+mat-card {
+    width: 100%;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 12px; 
+}
+mat-card-content{
+    text-align: center;
+}
+
+.remaining {
+    font-size: 18px;
+    width: 80%;
+    margin-top: 10px;
+}
+
+mat-progress-bar {
+    margin-top: 10px;
+    border-radius: 5px; 
+}
+@media (max-width: 768px) {
+    .water-tracker {
+        margin-left: 0; 
+        padding: 5px;  
+    }
+
+    .buttons {
+        flex-direction: column; 
+        gap: 10px; 
+    }
+
+    mat-card{
+        width: 90%;
+        margin: auto;
+    }
+
+    mat-raised-button {
+        width: 100%; 
+    }
+
+    .status, .remaining {
+        width: 100%; 
+    }
+}
+
