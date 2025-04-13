@@ -1,4 +1,4 @@
-#Választott téma:	Edzés követő alkalmazás
+# Választott téma:	Edzés követő alkalmazás
 
 
 # Reps&Sets
