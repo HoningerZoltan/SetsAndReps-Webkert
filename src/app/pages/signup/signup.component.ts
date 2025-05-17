@@ -7,8 +7,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { User } from '../../models/user.model';
-
+import { AuthService } from '../../shared/services/auth.service';
+import { User as AppUser } from '../../models/user.model';
 
 @Component({
   selector: 'app-signup',
@@ -28,7 +28,7 @@ import { User } from '../../models/user.model';
 })
 export class SignupComponent {
   signUpForm = new FormGroup({
-    username: new FormControl('',[Validators.required, Validators.minLength(6)]),
+    username: new FormControl('', [Validators.required, Validators.minLength(4)]),
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)]),
     rePassword: new FormControl('', [Validators.required]),
@@ -37,42 +37,46 @@ export class SignupComponent {
       lastname: new FormControl('', [Validators.required, Validators.minLength(2)])
     })
   });
-  
+
   isLoading = false;
   showForm = true;
   signupError = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   signup(): void {
     if (this.signUpForm.invalid) {
-      this.signupError = 'Please correct the form errors before submitting.';
+      this.signupError = 'Please correct the form errors.';
       return;
     }
 
-    const password = this.signUpForm.get('password');
-    const rePassword = this.signUpForm.get('rePassword');
+    const password = this.signUpForm.value.password;
+    const rePassword = this.signUpForm.value.rePassword;
 
-    if (password?.value !== rePassword?.value) {
+    if (password !== rePassword) {
+      this.signupError = 'Passwords do not match.';
       return;
     }
 
     this.isLoading = true;
     this.showForm = false;
 
-    const newUser: User = {
-      username: this.signUpForm.value.username || '',
-      firsName: this.signUpForm.value.name?.firstname || '',
-      lastName: this.signUpForm.value.name?.lastname || '',
-      email: this.signUpForm.value.email || '',
-      password: this.signUpForm.value.password || ''
+    const email = this.signUpForm.value.email!;
+    const userData: Partial<AppUser> = {
+      username: this.signUpForm.value.username!,
+      firsName: this.signUpForm.value.name?.firstname!,
+      lastName: this.signUpForm.value.name?.lastname!,
+      email: this.signUpForm.value.email!,
+      exercises: []
     };
 
-    console.log('New user:', newUser);
-    console.log('Form value:', this.signUpForm.value);
-
-    setTimeout(() => {
+    this.authService.signUp(email, password!, userData).then(() => {
       this.router.navigateByUrl('/home');
-    }, 2000);
+    }).catch(error => {
+      console.error('Signup error:', error);
+      this.signupError = 'Registration failed. Please try again.';
+      this.isLoading = false;
+      this.showForm = true;
+    });
   }
 }

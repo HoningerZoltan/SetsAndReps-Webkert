@@ -1,8 +1,9 @@
 export interface Exercise{
+    id:string;
     name:string;
-    musclegroup: 'chest' | 'back' | 'legs' | 'arms' | 'shoulders' | 'abs';
+    muscleGroup: 'chest' | 'back' | 'legs' | 'arms' | 'shoulders' | 'abs';
     description: string;
-    calories: string;
-    repetitions: string;
+    calories: number;
+    repetitions: number;
     
 }

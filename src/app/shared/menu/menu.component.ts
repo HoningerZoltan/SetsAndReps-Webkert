@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 })
 export class MenuComponent {
     //Menu átváltása -- menu.component.cs-ben is át kell állítani
-    isLoggedIn: boolean = true;
+    isLoggedIn: boolean = false;
   items = [
     {
       RouterLink: 'home',

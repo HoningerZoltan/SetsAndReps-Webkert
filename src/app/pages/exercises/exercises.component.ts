@@ -1,41 +1,43 @@
 import { CommonModule } from '@angular/common';
-import { Component, model, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormControl, ReactiveFormsModule } from '@angular/forms';  
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field'; 
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';  
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterLink } from '@angular/router';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { ExerciseCardComponent } from './exercises-card.component';
 import { Exercise } from '../../models/exercise.model';
+import { ExerciseService } from '../../shared/services/exercise.service';
 
 @Component({
   selector: 'app-exercises',
-  standalone: true, 
+  standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule, 
-    MatFormFieldModule, 
+    ReactiveFormsModule,
+    MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule, 
+    MatProgressSpinnerModule,
     MatSelectModule,
     MatCardModule,
     ExerciseCardComponent,
-    
+    RouterLink
   ],
   templateUrl: './exercises.component.html',
   styleUrls: ['./exercises.component.scss']
 })
-export class ExercisesComponent  implements OnInit{
-  
+export class ExercisesComponent implements OnInit {
   exerciseForm!: FormGroup;
+  exercises: Exercise[] = [];
+  isLoading = false;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private exerciseService: ExerciseService) {}
 
   ngOnInit(): void {
     this.exerciseForm = this.fb.group({
@@ -43,77 +45,50 @@ export class ExercisesComponent  implements OnInit{
       description: ['', [Validators.required, Validators.minLength(5)]],
       calories: ['', [Validators.required, Validators.min(0)]],
       repetitions: ['', [Validators.required, Validators.min(1)]],
-      muscleGroups: [[], Validators.required],
+      muscleGroup: ['', Validators.required]
+    });
+
+    this.loadExercises();
+  }
+
+  loadExercises(): void {
+    this.isLoading = true;
+    this.exerciseService.getAllExercises().subscribe({
+      next: (data) => {
+        this.exercises = data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Hiba a gyakorlatok lekérésekor:', err);
+        this.isLoading = false;
+      }
     });
   }
 
-
   onSubmit(): void {
     if (this.exerciseForm.valid) {
-      const formData: Exercise = {
-        name: this.exerciseForm.value.name,
-        musclegroup: this.exerciseForm.value.muscleGroup,
-        description: this.exerciseForm.value.description,
-        calories: this.exerciseForm.value.calories,
-        repetitions: this.exerciseForm.value.repetitions
+      const newExercise: Omit<Exercise, 'id'> = {
+        name: this.exerciseForm.value.name!,
+        muscleGroup: this.exerciseForm.value.muscleGroup!,
+        description: this.exerciseForm.value.description!,
+        calories: this.exerciseForm.value.calories!,
+        repetitions: this.exerciseForm.value.repetitions!
       };
-      console.log('Form Submitted:', formData);
+
+      this.exerciseService.addExercise(newExercise).then(() => {
+        this.exerciseForm.reset();
+        this.loadExercises();
+      }).catch(error => {
+        console.error('Hiba a mentés során:', error);
+      });
     }
   }
 
-  exercises = [
-    {
-      name: 'Push Up',
-      muscleGroup: "chest",
-      calories: 100,
-      repetitions: 10,
-      description: 'A great upper body exercise.',
-    },
-    {
-      name: 'Hammer bicpes',
-      muscleGroup: "arm",
-      calories: 57,
-      repetitions: 12,
-      description: 'A great arm exercise.',
-    },
-    {
-      name: 'Deadlift',
-      muscleGroup: "back",
-      calories: 200,
-      repetitions: 10,
-      description: 'A full-body strength movement.',
-    },
-    {
-      name: 'Squat',
-      muscleGroup: 'leg',
-      calories: 150,
-      repetitions: 12,
-      description: 'A lower body exercise that targets the quadriceps, hamstrings, and glutes.'
-    },
-    {
-      name: 'Plank',
-      muscleGroup: 'abs',
-      calories: 50,
-      repetitions: 1,
-      description: 'An isometric exercise that strengthens the core muscles.'
-    },
-    {
-      name: 'Bicep Curl',
-      muscleGroup: 'arm',
-      calories: 80,
-      repetitions: 12,
-      description: 'An isolation exercise that targets the biceps.'
-    },
-    {
-      name: 'Shoulder Press',
-      muscleGroup: 'shoulder',
-      calories: 120,
-      repetitions: 10,
-      description: 'A compound exercise that targets the deltoid muscles in the shoulders.'
-    }
-  ];
-
-  deleteExercise(index: number) {
-    this.exercises.splice(index, 1);
+  deleteExercise(exerciseId: string): void {
+    this.exerciseService.deleteExercise(exerciseId).then(() => {
+      this.loadExercises();
+    }).catch(error => {
+      console.error('Hiba a törlés során:', error);
+    });
   }
 }

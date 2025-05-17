@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Water } from '../../models/water.model';
+import { WaterService } from '../../shared/services/water.service';
 
 @Component({
   selector: 'app-water',
@@ -14,7 +15,7 @@ import { Water } from '../../models/water.model';
 export class WaterComponent {
   currentWater: number = 0;
   totalLimit: number = 2500;
-
+  constructor(private waterService: WaterService) {}
 
   addWater(amount: number) {
     this.currentWater += amount;  
@@ -25,12 +26,15 @@ export class WaterComponent {
     return Math.round((this.currentWater / this.totalLimit) * 100);
   }
 
-  saveWaterIntake() {
-     const formData: Water = {
-            userId: "testUSer",
-            date: new Date(),
-            amountMl: this.currentWater
-          };
-      console.log(formData.amountMl);
+  saveWaterIntake(): void {
+    const intake: Water = {
+      userId: 'testUser',
+      date: new Date(),
+      amountMl: this.currentWater
+    };
+
+    this.waterService.saveIntake(intake);
+    console.log(`[WaterComponent] Saved ${intake.amountMl} ml`);
+    this.currentWater = 0;
   }
 }

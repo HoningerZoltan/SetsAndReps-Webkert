@@ -1,60 +1,36 @@
-import { CommonModule, NgClass } from '@angular/common';
-import { Component, input, output } from '@angular/core';
-import { RouterLink, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-left-sidebar',
-  imports: [CommonModule,RouterModule],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './left-sidebar.component.html',
   styleUrl: './left-sidebar.component.scss'
 })
 export class LeftSidebarComponent {
-  isLeftSidebarCollapsed=input.required<boolean>();
-  ChangeIsLeftSidebarCollapsed=output<boolean>();
-  //Menu átváltása -- menu.component.cs-ben is át kell állítani
-  isLoggedIn: boolean = true;
-  items = [
-    {
-      RouterLink: 'home',
-      icon: 'fa fa-home',
-      labe: 'Home',
-    },
-    {
-      RouterLink: 'exercises',
-      icon: 'fa fa-dumbbell',
-      labe: 'Exercises',
-    },
-    {
-      RouterLink: 'calendar',
-      icon: 'fa fa-calendar',
-      labe: 'Calendar',
-    },
-    {
-      RouterLink: 'water',
-      icon: 'fal fa-tint',
-      labe: 'WaterTracker',
-    },
-    {
-      RouterLink: 'profile',
-      icon: 'fal fa-user',
-      labe: 'Profile',
-    },
-  ];
-  loggedOutItems=[
-    {
-      RouterLink: 'login',
-      icon: 'fa fa-sign-in-alt',
-      labe: 'Login'
-    },
-    {
-      RouterLink: 'signup',
-      icon: 'fa fa-user-plus',
-      labe: 'SignUp'
-    }
-  ];
+  @Input() isLeftSidebarCollapsed: boolean = false;
+  @Output() ChangeIsLeftSidebarCollapsed = new EventEmitter<boolean>();
+
+  @Input() isLoggedIn: boolean = true; 
+  @Output() signOutClicked = new EventEmitter<void>();
 
   toggleCollapse(): void {
-    this.ChangeIsLeftSidebarCollapsed.emit(!this.isLeftSidebarCollapsed());
+    this.ChangeIsLeftSidebarCollapsed.emit(!this.isLeftSidebarCollapsed);
   }
 
+  items = [
+    { RouterLink: 'home', icon: 'fa fa-home', label: 'Home' },
+    { RouterLink: 'exercises', icon: 'fa fa-dumbbell', label: 'Exercises' },
+    { RouterLink: 'calendar', icon: 'fa fa-calendar', label: 'Calendar' },
+    { RouterLink: 'water', icon: 'fal fa-tint', label: 'WaterTracker' },
+    { RouterLink: 'profile', icon: 'fal fa-user', label: 'Profile' },
+    { RouterLink: null, icon: 'fa fa-sign-out-alt', label: 'Sign Out', action: 'signout' }
+  ];
+
+  loggedOutItems = [
+    { RouterLink: 'login', icon: 'fa fa-sign-in-alt', label: 'Login' },
+    { RouterLink: 'signup', icon: 'fa fa-user-plus', label: 'SignUp' }
+  ];
 }

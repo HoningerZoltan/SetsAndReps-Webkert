@@ -1,13 +1,28 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MonthNamePipe } from './month-name.pipe';
-import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormArray, FormGroup, FormsModule, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { ExerciseService } from '../../shared/services/exercise.service';
+import { WorkoutService } from '../../shared/services/workout.service';
 import { Workout } from '../../models/workout.model';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-calendar',
-  imports: [CommonModule,MonthNamePipe, FormsModule, ReactiveFormsModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MonthNamePipe,
+    FormsModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule
+  ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss']
 })
@@ -17,64 +32,106 @@ export class CalendarComponent implements OnInit {
   daysInMonth: number[] = [];
   firstDayIndex: number = 0;
   weekDays: string[] = ['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'];
-  selectedDay:number| null=null;
-  restDayChecked: boolean = false;
-  isRestDay: boolean = false; 
-exerciseForm: FormGroup;
-  availableExercises: string[] = ['Futás', 'Súlyemelés', 'Úszás', 'Kerékpározás'];
-  savedWorkouts: { exercises: string[], totalTime: number }[] = [];
+  selectedDay: number | null = null;
 
-  constructor(private fb: FormBuilder) {
+  workoutDays: number[] = [];
+  restDays: number[] = [];
 
+  exerciseForm: FormGroup;
+  availableExercises: string[] = [];
+
+  constructor(
+    private fb: FormBuilder,
+    private exerciseService: ExerciseService,
+    private workoutService: WorkoutService
+  ) {
     this.exerciseForm = this.fb.group({
-      exercises: this.fb.array([]),
+      exercises: this.fb.array([], this.validateNonEmptyArray),
       totalTime: ['', [Validators.required, Validators.min(1)]],
     });
   }
 
-  addExercise(exercise: string) {
-    const exercises = this.exerciseForm.get('exercises') as any;
-    if (!exercises.value.includes(exercise)) {
-      exercises.push(this.fb.control(exercise));
-    }
+  ngOnInit() {
+    this.generateCalendar(this.currentYear, this.currentMonth);
+
+    this.exerciseService.getAllExercises().subscribe(exs => {
+      this.availableExercises = exs.map(e => e.name);
+    });
   }
 
-  saveWorkout() {
-    if (this.exerciseForm.valid) {
-      const formData: Workout = {
-        username: "test",
-        date: new Date(this.currentYear,this.currentMonth,this.selectedDay!),
-        isRestDay:false,
-        duration: this.exerciseForm.value.totalTime,
-        exercises: this.exerciseForm.value.exercises
-      };
-      this.exerciseForm.reset();
-      console.log(formData);
-      alert('Edzés mentve!');
-      this.closeModal();
+  get exercises(): FormArray {
+    return this.exerciseForm.get('exercises') as FormArray;
+  }
+
+  validateNonEmptyArray(control: AbstractControl): ValidationErrors | null {
+    const value = (control as FormArray).value;
+    return value && value.length > 0 ? null : { required: true };
+  }
+
+  addExercise(exercise: string) {
+    if (!this.exercises.value.includes(exercise)) {
+      this.exercises.push(this.fb.control(exercise));
+      this.exerciseForm.updateValueAndValidity();
     }
   }
 
   removeExercise(exercise: string) {
-    const exercises = this.exerciseForm.get('exercises') as any;
-    const index = exercises.value.indexOf(exercise);
+    const index = this.exercises.value.indexOf(exercise);
     if (index !== -1) {
-      exercises.removeAt(index);
+      this.exercises.removeAt(index);
+      this.exerciseForm.updateValueAndValidity();
     }
   }
 
+  saveWorkout() {
+    if (this.exerciseForm.valid && this.selectedDay !== null) {
+      const workout: Workout = {
+        username: 'test',
+        date: new Date(this.currentYear, this.currentMonth, this.selectedDay),
+        isRestDay: false,
+        duration: this.exerciseForm.value.totalTime,
+        exercises: this.exercises.value
+      };
 
-
-  ngOnInit() {
-    this.generateCalendar(this.currentYear, this.currentMonth);
-    
+      this.workoutService.saveWorkout(workout);
+      this.exerciseForm.reset({ totalTime: null });
+      this.exercises.clear();
+      this.exerciseForm.markAsPristine();
+      this.exerciseForm.markAsUntouched();
+      this.exerciseForm.updateValueAndValidity();
+      this.workoutDays.push(this.selectedDay);
+      this.closeModal();
+    }
   }
 
+  openDayModal(day: number): void {
+    this.selectedDay = day;
+    this.exerciseForm.reset({ totalTime: null });
+    this.exercises.clear();
+    this.exerciseForm.markAsPristine();
+    this.exerciseForm.markAsUntouched();
+    this.exerciseForm.updateValueAndValidity();
+  }
+
+  closeModal(): void {
+    this.selectedDay = null;
+    this.exerciseForm.reset({ totalTime: null });
+    this.exercises.clear();
+    this.exerciseForm.updateValueAndValidity();
+  }
+
+  onRestDayChange() {
+    if (this.selectedDay !== null && !this.restDays.includes(this.selectedDay)) {
+      this.restDays.push(this.selectedDay);
+      this.exerciseForm.reset({ totalTime: null });
+      this.exercises.clear();
+      this.exerciseForm.updateValueAndValidity();
+    }
+  }
 
   generateCalendar(year: number, month: number) {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
-
     this.firstDayIndex = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
     this.daysInMonth = Array.from({ length: lastDay.getDate() }, (_, i) => i + 1);
   }
@@ -99,30 +156,6 @@ exerciseForm: FormGroup;
     this.generateCalendar(this.currentYear, this.currentMonth);
   }
 
-  openDayModal(day: number) {
-    this.selectedDay = day;
-    this.isRestDay = false; 
-    this.exerciseForm.reset(); 
-  }
-
-  closeModal() {
-    this.selectedDay = null;
-    this.isRestDay = false;
-    this.exerciseForm.reset(); 
-  }
-
-  onRestDayChange() {
-    if (this.isRestDay) {
-      this.exerciseForm.reset();
-      this.restDays.push(this.selectedDay||0);
-    }
-  }
-
-
-  workoutDays: number[] = [1,2,4, 5, 10]; 
-  restDays: number[] = [3, 7, 12];    
-
-
   isWorkoutDay(day: number): boolean {
     return this.workoutDays.includes(day);
   }
@@ -130,5 +163,4 @@ exerciseForm: FormGroup;
   isRestDayColor(day: number): boolean {
     return this.restDays.includes(day);
   }
-
 }

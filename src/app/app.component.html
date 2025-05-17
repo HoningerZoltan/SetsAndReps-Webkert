@@ -1,6 +1,8 @@
 
 <app-left-sidebar 
     [isLeftSidebarCollapsed]="isLftSidebarCollapsed()"
+    [isLoggedIn]="userIsLoggedIn"
+      (signOutClicked)="handleSignOut()"
     (ChangeIsLeftSidebarCollapsed)="changeIsLeftSidebarCollapsed($event)">
 </app-left-sidebar>
 <app-menu></app-menu>

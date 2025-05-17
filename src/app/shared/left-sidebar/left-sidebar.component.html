@@ -1,45 +1,54 @@
-<div class="sidenav" [ngClass]="isLeftSidebarCollapsed() ? 'sidenav-collapsed' : ''">
-    <div class="logo-container">
-        <button class="logo" (click)="toggleCollapse()">
-            <i class="fal fa-bars"></i>
-        </button>
-        @if(!isLeftSidebarCollapsed()){
-                  <div class="logo-text">Reps & Sets</div>
-        }
+<div class="sidenav" [ngClass]="isLeftSidebarCollapsed ? 'sidenav-collapsed' : ''">
+  <div class="logo-container">
+    <button class="logo" (click)="toggleCollapse()">
+      <i class="fal fa-bars"></i>
+    </button>
+    <div *ngIf="!isLeftSidebarCollapsed" class="logo-text">Reps & Sets</div>
+  </div>
 
-    </div>
-    <div class="sidenav-nav">
-        @for (item of items; track $index) {
-          <li class="sidenav-nav-item" *ngIf="isLoggedIn">
-            <a
-              class="sidenav-nav-link"
-              [routerLink]="item.RouterLink"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }"
-            >
-              <i class="sidenav-link-icon" [class]="item.icon"></i>
-              @if(!isLeftSidebarCollapsed()){
-                                <span class="sidenav-link-text">{{ item.labe }}</span>
-              }
+  <div class="sidenav-nav">
+    <!-- Bejelentkezett felhasználó menüpontjai -->
+    <ng-container *ngIf="isLoggedIn">
+      <li class="sidenav-nav-item" *ngFor="let item of items">
+        <ng-container *ngIf="item.action !== 'signout'; else signOutBlock">
+          <a
+            class="sidenav-nav-link"
+            [routerLink]="item.RouterLink"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <i class="sidenav-link-icon" [class]="item.icon"></i>
+            <span *ngIf="!isLeftSidebarCollapsed" class="sidenav-link-text">
+              {{ item.label }}
+            </span>
+          </a>
+        </ng-container>
+      </li>
 
-            </a>
-          </li>
-        }
-        @for (item of loggedOutItems; track $index) {
-          <li class="sidenav-nav-item" *ngIf="!isLoggedIn">
-            <a
-              class="sidenav-nav-link"
-              [routerLink]="item.RouterLink"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }"
-            >
-              <i class="sidenav-link-icon" [class]="item.icon"></i>
-              @if(!isLeftSidebarCollapsed()){
-                                <span class="sidenav-link-text">{{ item.labe }}</span>
-              }
+      <!-- Sign Out blokk -->
+      <ng-template #signOutBlock>
+        <li class="sidenav-nav-item">
+          <a class="sidenav-nav-link" (click)="signOutClicked.emit()" style="cursor: pointer;">
+            <i class="sidenav-link-icon fa fa-sign-out-alt"></i>
+            <span *ngIf="!isLeftSidebarCollapsed" class="sidenav-link-text">Sign Out</span>
+          </a>
+        </li>
+      </ng-template>
+    </ng-container>
 
-            </a>
-          </li>
-        }
-      </div>
+    <!-- Nem bejelentkezett felhasználó menüpontjai -->
+    <ng-container *ngIf="!isLoggedIn">
+      <li class="sidenav-nav-item" *ngFor="let item of loggedOutItems">
+        <a
+          class="sidenav-nav-link"
+          [routerLink]="item.RouterLink"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <i class="sidenav-link-icon" [class]="item.icon"></i>
+          <span *ngIf="!isLeftSidebarCollapsed" class="sidenav-link-text">{{ item.label }}</span>
+        </a>
+      </li>
+    </ng-container>
+  </div>
 </div>
