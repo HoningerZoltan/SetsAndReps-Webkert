@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Workout } from '../../models/workout.model';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { addDoc, collection, Firestore } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -9,13 +10,20 @@ export class WorkoutService {
   private workouts: Workout[] = [];
   private workoutsSubject = new BehaviorSubject<Workout[]>([]);
 
-  constructor() {}
+  constructor(private firestore: Firestore) {}
 
   saveWorkout(workout: Workout): void {
-    this.workouts.push(workout);
-    this.workoutsSubject.next([...this.workouts]);
-    console.log('[WorkoutService] Edzés mentve:', workout);
+    const workoutsRef = collection(this.firestore, 'Workouts');
+    addDoc(workoutsRef, {
+      ...workout,
+      date: workout.date.toISOString() // mentés ISO formátumban
+    }).then(() => {
+      console.log('Workout saved to Firestore');
+    }).catch(error => {
+      console.error('Error saving workout:', error);
+    });
   }
+  
 
   getAllWorkouts(): Observable<Workout[]> {
     return this.workoutsSubject.asObservable();

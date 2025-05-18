@@ -40,20 +40,23 @@ async saveIntake(intake: Water): Promise<void> {
   // Lekérdezzük az aznapi eddigi összes mennyiséget
   const colRef = collection(this.firestore, this.WATER);
   const q = query(
-    colRef,
-    where('userId', '==', user.uid),
-    where('dateString', '==', today)
-  );
+  collection(this.firestore, 'waterIntake'),
+  where('userId', '==', user.uid),
+  where('dateString', '==', '2024-05-18'), // vagy a getTodayString()
+  orderBy('amountMl', 'desc'),
+  limit(1)
+);
   const snapshot = await getDocs(q);
-
   let currentTotal = 0;
-  snapshot.forEach(doc => {
+  if (!snapshot.empty) {
+    const doc = snapshot.docs[0];
     const data = doc.data() as Water;
-    currentTotal += data.amountMl ?? 0;
-  });
+    currentTotal = data.amountMl ?? 0;
+  }
 
   const newAmount = intake.amountMl;
   const updatedTotal = currentTotal + newAmount;
+
 
   // Új dokumentum mentése
   await addDoc(colRef, {
@@ -69,33 +72,32 @@ async saveIntake(intake: Water): Promise<void> {
   await this.updateTotal(); // Ez már lekéri a legnagyobbat újra
 }
 
- async updateTotal(): Promise<void> {
+async updateTotal(): Promise<void> {
   const user = await firstValueFrom(this.authService.currentUser.pipe(take(1)));
   if (!user) return;
 
   const today = this.getTodayString();
   const colRef = collection(this.firestore, this.WATER);
+
   const q = query(
     colRef,
     where('userId', '==', user.uid),
-    where('dateString', '==', today),
-    orderBy('amountMl', 'desc'),
-    limit(1)
+    where('dateString', '==', today)
   );
 
   const snapshot = await getDocs(q);
 
-  let maxValue = 0;
-  if (!snapshot.empty) {
-    const doc = snapshot.docs[0];
+  let total = 0;
+  snapshot.forEach(doc => {
     const data = doc.data() as Water;
-    maxValue = data.amountMl ?? 0;
-  }
+    total += data.amountMl ?? 0;
+  });
 
-  this.waterTotalSubject.next(maxValue);
+  this.waterTotalSubject.next(total);
 }
 
   async getAllAmountToday(): Promise<void> {
     await this.updateTotal();
   }
+  
 }

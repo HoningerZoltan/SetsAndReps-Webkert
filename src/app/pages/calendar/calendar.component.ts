@@ -9,6 +9,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { firstValueFrom, take } from 'rxjs';
+import { AuthService } from '../../shared/services/auth.service';
+import { Exercise } from '../../models/exercise.model';
 
 @Component({
   selector: 'app-calendar',
@@ -38,10 +41,11 @@ export class CalendarComponent implements OnInit {
   restDays: string[] = [];
 
   exerciseForm: FormGroup;
-  availableExercises: string[] = [];
+  availableExercises: Exercise[] = [];
 
   constructor(
     private fb: FormBuilder,
+    private authService: AuthService,
     private exerciseService: ExerciseService,
     private workoutService: WorkoutService
   ) {
@@ -53,9 +57,8 @@ export class CalendarComponent implements OnInit {
 
   ngOnInit() {
     this.generateCalendar(this.currentYear, this.currentMonth);
-
     this.exerciseService.getAllExercises().subscribe(exs => {
-      this.availableExercises = exs.map(e => e.name);
+      this.availableExercises = exs;
     });
   }
 
@@ -68,12 +71,12 @@ export class CalendarComponent implements OnInit {
     return value && value.length > 0 ? null : { required: true };
   }
 
-  addExercise(exercise: string) {
-    if (!this.exercises.value.includes(exercise)) {
-      this.exercises.push(this.fb.control(exercise));
-      this.exerciseForm.updateValueAndValidity();
-    }
+  addExercise(exercise: Exercise) {
+  if (!this.exercises.value.includes(exercise.id)) {
+    this.exercises.push(this.fb.control(exercise));
+    this.exerciseForm.updateValueAndValidity();
   }
+}
 
   removeExercise(exercise: string) {
     const index = this.exercises.value.indexOf(exercise);
@@ -83,14 +86,16 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  saveWorkout() {
+  async saveWorkout() {
     if (this.exerciseForm.valid && this.selectedDay !== null) {
+      const user = await firstValueFrom(this.authService.currentUser.pipe(take(1)));
+      if (!user) throw new Error('No authenticated user found');
       const workout: Workout = {
-        username: 'test',
+        username: user.uid,
         date: new Date(this.currentYear, this.currentMonth, this.selectedDay),
         isRestDay: false,
         duration: this.exerciseForm.value.totalTime,
-        exercises: this.exercises.value
+        exercises: this.exercises.value.map((ex: Exercise) => ex.id)
       };
 
       this.workoutService.saveWorkout(workout);
@@ -121,13 +126,31 @@ export class CalendarComponent implements OnInit {
     this.exerciseForm.updateValueAndValidity();
   }
 
-  onRestDayChange() {
+ async onRestDayChange() {
   if (this.selectedDay !== null) {
     const date = new Date(this.currentYear, this.currentMonth, this.selectedDay);
     const dateStr = date.toISOString().split('T')[0];
 
     if (!this.restDays.includes(dateStr)) {
       this.restDays.push(dateStr);
+
+      // Lekérjük a felhasználót
+      const user = await firstValueFrom(this.authService.currentUser.pipe(take(1)));
+      if (!user) {
+        console.error('Nincs bejelentkezett felhasználó.');
+        return;
+      }
+
+      const restDayWorkout: Workout = {
+        username: user.uid,
+        date: date,
+        isRestDay: true,
+        duration: 0,
+        exercises: []
+      };
+
+      this.workoutService.saveWorkout(restDayWorkout);
+
       this.exerciseForm.reset({ totalTime: null });
       this.exercises.clear();
       this.exerciseForm.updateValueAndValidity();

@@ -42,7 +42,7 @@
                 mat-button
                 type="button"
                 (click)="addExercise(ex)">
-          {{ ex }}
+          {{ ex.name }}
         </button>
       </div>
     </div>
@@ -51,7 +51,7 @@
       <h3>Selected exercises:</h3>
       <ul>
         <li *ngFor="let ex of exerciseForm.get('exercises')?.value">
-          {{ ex }}
+          {{ ex.name }}
           <button mat-icon-button color="warn" type="button" (click)="removeExercise(ex)">
             <mat-icon>delete</mat-icon>
           </button>
