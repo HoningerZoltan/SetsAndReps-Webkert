@@ -36,7 +36,7 @@
     <h2>{{ currentYear }}.{{ (currentMonth + 1) | number:'2.0' }}.{{ selectedDay }}</h2>
 
     <div class="exercise-selector">
-      <h3>Válassz gyakorlatot:</h3>
+      <h3>Choose Exercise:</h3>
       <div class="exercise-buttons">
         <button *ngFor="let ex of availableExercises"
                 mat-button
@@ -48,7 +48,7 @@
     </div>
 
     <div *ngIf="exerciseForm.get('exercises')?.value.length > 0">
-      <h3>Kiválasztott gyakorlatok:</h3>
+      <h3>Selected exercises:</h3>
       <ul>
         <li *ngFor="let ex of exerciseForm.get('exercises')?.value">
           {{ ex }}
@@ -60,16 +60,16 @@
     </div>
 
     <mat-form-field appearance="outline">
-      <mat-label>Időtartam (perc)</mat-label>
+      <mat-label>Duration (minute)</mat-label>
       <input matInput type="number" formControlName="totalTime">
     </mat-form-field>
 
     <div class="modal-actions">
       <button mat-raised-button color="primary" type="submit" [disabled]="exerciseForm.invalid">
-        Mentés
+        Save
       </button>
       <button mat-stroked-button color="warn" type="button" (click)="onRestDayChange()">
-        Pihenőnap
+        Rest Day
       </button>
     </div>
   </form>

@@ -2,16 +2,26 @@
 <div class="horizontal-menu">
     <ul class="horizontal-menu-nav">
       @for (item of items; track $index) {
-        <li class="horizontal-menu-item" *ngIf="isLoggedIn">
-          <a
-            class="horizontal-menu-link"
-            [routerLink]="item.RouterLink"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            <i class="horizontal-link-icon" [class]="item.icon"></i>
-          </a>
-        </li>
+<li class="horizontal-menu-item" *ngIf="isLoggedIn">
+  <a *ngIf="item.action !== 'signout'; else signOutBlock"
+    class="horizontal-menu-link"
+    [routerLink]="item.RouterLink"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+  >
+    <i class="horizontal-link-icon" [class]="item.icon"></i>
+  </a>
+</li>
+
+<ng-template #signOutBlock>
+    <a
+      class="horizontal-menu-link"
+      (click)="signOutClicked.emit()"
+      style="cursor: pointer;"
+    >
+      <i class="horizontal-link-icon fa fa-sign-out-alt"></i>
+    </a>
+</ng-template>
       }
       @for (item of loggedOutItems; track $index) {
         <li class="horizontal-menu-item" *ngIf="!isLoggedIn">

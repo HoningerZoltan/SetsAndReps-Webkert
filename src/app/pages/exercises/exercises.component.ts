@@ -26,8 +26,7 @@ import { ExerciseService } from '../../shared/services/exercise.service';
     MatProgressSpinnerModule,
     MatSelectModule,
     MatCardModule,
-    ExerciseCardComponent,
-    RouterLink
+    ExerciseCardComponent
   ],
   templateUrl: './exercises.component.html',
   styleUrls: ['./exercises.component.scss']

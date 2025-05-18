@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MainComponent } from '../main/main.component';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -10,46 +10,20 @@ import { CommonModule } from '@angular/common';
   styleUrl: './menu.component.scss'
 })
 export class MenuComponent {
-    //Menu átváltása -- menu.component.cs-ben is át kell állítani
-    isLoggedIn: boolean = false;
+    @Input() isLoggedIn: boolean = true;
+    @Output() signOutClicked = new EventEmitter<void>();
   items = [
-    {
-      RouterLink: 'home',
-      icon: 'fa fa-home',
-      labe: 'Home',
-    },
-    {
-      RouterLink: 'exercises',
-      icon: 'fa fa-dumbbell',
-      labe: 'Exercises',
-    },
-    {
-      RouterLink: 'calendar',
-      icon: 'fa fa-calendar',
-      labe: 'Calendar',
-    },
-    {
-      RouterLink: 'water',
-      icon: 'fal fa-tint',
-      labe: 'WaterTracker',
-    },
-    {
-      RouterLink: 'profile',
-      icon: 'fal fa-user',
-      labe: 'Profile',
-    },
+    { RouterLink: 'home', icon: 'fa fa-home', label: 'Home' },
+    { RouterLink: 'exercises', icon: 'fa fa-dumbbell', label: 'Exercises' },
+    { RouterLink: 'calendar', icon: 'fa fa-calendar', label: 'Calendar' },
+    { RouterLink: 'water', icon: 'fal fa-tint', label: 'WaterTracker' },
+    { RouterLink: 'profile', icon: 'fal fa-user', label: 'Profile' },
+    { RouterLink: null, icon: 'fa fa-sign-out-alt', label: 'Sign Out', action: 'signout' }
   ];
-  loggedOutItems=[
-    {
-      RouterLink: 'login',
-      icon: 'fa fa-sign-in-alt',
-      labe: 'Login'
-    },
-    {
-      RouterLink: 'signup',
-      icon: 'fa fa-user-plus',
-      labe: 'SignUp'
-    }
+
+  loggedOutItems = [
+    { RouterLink: 'login', icon: 'fa fa-sign-in-alt', label: 'Login' },
+    { RouterLink: 'signup', icon: 'fa fa-user-plus', label: 'SignUp' }
   ];
 
 }

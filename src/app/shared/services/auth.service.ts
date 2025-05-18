@@ -43,7 +43,7 @@ export class AuthService {
   signOut(): Promise<void> {
     localStorage.setItem('isLoggedIn', 'false');
     return signOut(this.auth).then(() => {
-      this.router.navigateByUrl('/home');
+      this.router.navigateByUrl('/login');
     });
   }
   getUser(): Observable<User | null> {

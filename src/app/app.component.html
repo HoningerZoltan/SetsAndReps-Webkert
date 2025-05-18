@@ -5,6 +5,9 @@
       (signOutClicked)="handleSignOut()"
     (ChangeIsLeftSidebarCollapsed)="changeIsLeftSidebarCollapsed($event)">
 </app-left-sidebar>
-<app-menu></app-menu>
+<app-menu
+    [isLoggedIn]="userIsLoggedIn"
+      (signOutClicked)="handleSignOut()"
+></app-menu>
 <app-main ></app-main>
 

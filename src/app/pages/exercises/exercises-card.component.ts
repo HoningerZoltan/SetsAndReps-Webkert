@@ -2,11 +2,12 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+import { CalorieFormatPipe } from "./calorie-format.pipe";
 
 @Component({
   selector: 'app-exercise-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule],
+  imports: [CommonModule, MatCardModule, MatButtonModule, CalorieFormatPipe],
   template: `
     <mat-card class="exercise-card">
       <mat-card-header>
@@ -16,7 +17,7 @@ import { CommonModule } from '@angular/common';
       <img mat-card-image [src]="'/images/musclegroups/' + exercise.muscleGroup + '.png'" class="exercise-image" alt="Exercise Image" />
       <mat-card-content>
         <p>{{ exercise.description }}</p>
-        <p><strong>Calories:</strong> {{ exercise.calories }}</p>
+        <p><strong>Calories:</strong> {{ exercise.calories | calorieFormat }}</p>
         <p><strong>Repetitions:</strong> {{ exercise.repetitions }}</p>
       </mat-card-content>
       <mat-card-actions>
