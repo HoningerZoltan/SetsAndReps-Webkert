@@ -34,8 +34,8 @@ export class CalendarComponent implements OnInit {
   weekDays: string[] = ['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'];
   selectedDay: number | null = null;
 
-  workoutDays: number[] = [];
-  restDays: number[] = [];
+  workoutDays: string[] = [];
+  restDays: string[] = [];
 
   exerciseForm: FormGroup;
   availableExercises: string[] = [];
@@ -99,7 +99,8 @@ export class CalendarComponent implements OnInit {
       this.exerciseForm.markAsPristine();
       this.exerciseForm.markAsUntouched();
       this.exerciseForm.updateValueAndValidity();
-      this.workoutDays.push(this.selectedDay);
+      const workoutDate = new Date(this.currentYear, this.currentMonth, this.selectedDay);
+      this.workoutDays.push(workoutDate.toISOString().split('T')[0]); // "YYYY-MM-DD"
       this.closeModal();
     }
   }
@@ -121,14 +122,18 @@ export class CalendarComponent implements OnInit {
   }
 
   onRestDayChange() {
-    if (this.selectedDay !== null && !this.restDays.includes(this.selectedDay)) {
-      this.restDays.push(this.selectedDay);
+  if (this.selectedDay !== null) {
+    const date = new Date(this.currentYear, this.currentMonth, this.selectedDay);
+    const dateStr = date.toISOString().split('T')[0];
+
+    if (!this.restDays.includes(dateStr)) {
+      this.restDays.push(dateStr);
       this.exerciseForm.reset({ totalTime: null });
       this.exercises.clear();
       this.exerciseForm.updateValueAndValidity();
     }
   }
-
+}
   generateCalendar(year: number, month: number) {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -157,10 +162,11 @@ export class CalendarComponent implements OnInit {
   }
 
   isWorkoutDay(day: number): boolean {
-    return this.workoutDays.includes(day);
-  }
-
+  const dateStr = new Date(this.currentYear, this.currentMonth, day).toISOString().split('T')[0];
+  return this.workoutDays.includes(dateStr);
+}
   isRestDayColor(day: number): boolean {
-    return this.restDays.includes(day);
-  }
+  const dateStr = new Date(this.currentYear, this.currentMonth, day).toISOString().split('T')[0];
+  return this.restDays.includes(dateStr);
+}
 }
