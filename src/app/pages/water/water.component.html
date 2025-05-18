@@ -11,14 +11,14 @@
     <div class="status">
       <mat-card>
         <mat-card-content>
-          <p>{{ currentWater }} ml / {{ totalLimit }} ml</p>
-          <p>{{ getPercentage() }}%</p>
-          <mat-progress-bar [value]="getPercentage()" mode="determinate"></mat-progress-bar>
+          <p>{{ (((waterAmount$ | async) ?? 0) + addedAmount) }} ml / {{ totalLimit }} ml</p>
+          <p>{{ getPercentage(((waterAmount$ | async) ?? 0)+addedAmount) }}%</p>
+          <mat-progress-bar [value]="getPercentage(((waterAmount$ | async) ?? 0)+addedAmount)" mode="determinate"></mat-progress-bar>
         </mat-card-content>
       </mat-card>
     </div>
 
-    <div *ngIf="currentWater > 0">
+    <div *ngIf="addedAmount> 0">
       <button mat-raised-button color="accent" (click)="saveWaterIntake()">Save Intake</button>
     </div>
   </div>

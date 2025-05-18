@@ -5,5 +5,6 @@ export interface User{
     firsName: string;
     lastName: string;
     exercises: string[];
+    water?: string[];
     
 }
